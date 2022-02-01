@@ -72,14 +72,16 @@ class GameScene extends Phaser.Scene {
         }
 
         this.input.on('pointerdown', function() {
-            var pointer = this.input.activePointer;
-            let newIndex = 9 * Math.floor((pointer.worldY - 175) / 50) + Math.floor((pointer.worldX - 75) / 50);
+			var pointer = this.input.activePointer;
+			if (pointer.worldX >= 75 && pointer.worldX <= 525 && pointer.worldY >= 175 && pointer.worldY <= 625) {
+	            let newIndex = 9 * Math.floor((pointer.worldY - 175) / 50) + Math.floor((pointer.worldX - 75) / 50);
 
-            if (gameState.index != -1) {
-                gameState.squares[gameState.index].setFillStyle(0xffffff);
-            }
-            gameState.squares[newIndex].setFillStyle(0xdddddd);
-            gameState.index = newIndex;
+	            if (gameState.index != -1) {
+	                gameState.squares[gameState.index].setFillStyle(0xffffff);
+	            }
+	            gameState.squares[newIndex].setFillStyle(0xdddddd);
+	            gameState.index = newIndex;
+			}
         }, this)
 
 		const timeUpdate = () => {
@@ -100,21 +102,24 @@ class GameScene extends Phaser.Scene {
 		gameState.seconds = 0;
 		let timeText = this.add.text(475, 150, 'Time 0:00', { fill: '#000000', fontSize: '20px'}).setOrigin(0.5);
 
+		let restart = this.add.rectangle(115, 150, 80, 30).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive()
+			.on('pointerover', () => {restart.setFillStyle(0xdddddd)})
+			.on('pointerout', () => {restart.setFillStyle(0xffffff)})
+			.on('pointerdown', () => {gameState.seconds = -1; for (var i = 0; i < 81; i++) {
+				gameState.entries[i] = gameState.start[i];
+				gameState.texts[i].setText(gameState.entries[i]);
+			}});
+		let restartText = this.add.text(115, 150, 'Restart', {fill: '#000000',fontSize: '12px'}).setOrigin(0.5);
+		let newGame = this.add.rectangle(205, 150, 80, 30).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive()
+			.on('pointerover', () => {newGame.setFillStyle(0xdddddd)})
+			.on('pointerout', () => {newGame.setFillStyle(0xffffff)})
+			.on('pointerdown', () => {this.scene.stop('GameScene'); this.scene.start('StartScene');});
+		let newGameText = this.add.text(205, 150, 'New Game', {fill: '#000000',fontSize: '12px'}).setOrigin(0.5);
+
         gameState.keys = this.input.keyboard.addKeys('ONE,TWO,THREE,FOUR,FIVE,SIX,SEVEN,EIGHT,NINE');
     }
 
     update() {
-        this.input.on('pointerdown', function() {
-            var pointer = this.input.activePointer;
-            let newIndex = 9 * Math.floor((pointer.worldY - 175) / 50) + Math.floor((pointer.worldX - 75) / 50);
-
-            if (gameState.index != -1) {
-                gameState.squares[gameState.index].setFillStyle(0xffffff);
-            }
-            gameState.squares[newIndex].setFillStyle(0xdddddd);
-            gameState.index = newIndex;
-        }, this)
-
         let pressedNumber = '';
         if (gameState.keys.ONE.isDown) {
             pressedNumber = '1';
