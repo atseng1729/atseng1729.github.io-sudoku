@@ -1,7 +1,8 @@
 const gameState = {
     selectedNumber: '1',
     index: -1,
-    missing: -1
+    missing: -1,
+    hintMode: 0
 }
 
 const base = 3;
