@@ -9,10 +9,20 @@ const base = 3;
 const side = 9;
 const rBase = [0, 1, 2];
 
+var isMobile = false;
+var width = 0.8 * Math.min(window.innerWidth, window.innerHeight);
+var height = width;
+
+window.addEventListener('touchstart', function () {
+    isMobile = true;
+    width = window.innerWidth;
+    height = window.innerHeight;
+})
+
 const config = {
     type: Phaser.AUTO,
-    width: 600,
-    height: 800,
+    width: width,
+    height: height,
     backgroundColor: "#ffffff",
     scene: [StartScene, GameScene]
 };
