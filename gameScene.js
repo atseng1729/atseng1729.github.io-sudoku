@@ -1,6 +1,6 @@
-class GameScene extends Phaser.Scene {
+class GameScenePC extends Phaser.Scene {
 	constructor() {
-		super({ key: 'GameScene' })
+		super({ key: 'GameScenePC' })
 	}
 
     // pseudo random shuffling algorithm
@@ -117,7 +117,8 @@ class GameScene extends Phaser.Scene {
 		let newGame = this.add.rectangle(205, 150, 80, 30).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive()
 			.on('pointerover', () => {newGame.setFillStyle(0xdddddd)})
 			.on('pointerout', () => {newGame.setFillStyle(0xffffff)})
-			.on('pointerdown', () => {this.scene.stop('GameScene'); this.scene.start('StartScene');});
+			.on('pointerdown', () => {this.scene.stop('GameScene'); game.scale.resize(window.innerWidth, window.innerHeight);
+				this.scene.start('StartScene');});
 		let newGameText = this.add.text(205, 150, 'New Game', {fill: '#000000',fontSize: '12px'}).setOrigin(0.5);
 
 		let light = this.add.rectangle(270, 150, 30, 30).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive()
