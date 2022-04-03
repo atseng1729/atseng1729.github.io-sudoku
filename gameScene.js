@@ -42,43 +42,51 @@ class GameScenePC extends Phaser.Scene {
     }
 
 	preload() {
-		this.load.svg('lightbulb', 'assets/lightbulb.svg', {width: 24, height: 24});
+		this.load.svg('hint', 'assets/hint.svg', {width: 0.4 * s, height: 0.4 * s});
+		this.load.svg('restart', 'assets/restart.svg', {width: 0.4 * s, height: 0.4 * s});
+		this.load.svg('home', 'assets/home.svg', {width: 0.4 * s, height: 0.4 * s});
 	}
 
     create() {
+        const fontSize = `${w / 15}px`;
+        const fontSize2 = `${w / 45}px`;
+
         gameState.solution = this.solution();
         gameState.start = this.board(gameState.solution);
         gameState.entries = gameState.start.slice();
 
         // create game borders
-        let borders = this.add.group();
-        for (x of [150, 300, 450]) {
-            for (y of [250, 400, 550]) {
-                borders.add(this.add.rectangle(x, y, 150, 150).setStrokeStyle(4, 0x444444).setDepth(1));
+        for (var x of [-3 * s, 0, 3 * s]) {
+            for (var y of [-3 * s, 0, 3 * s]) {
+                this.add.rectangle(midWidth + x, midHeight + y, 3 * s, 3 * s).setStrokeStyle(4, 0x444444).setOrigin(0.5).setDepth(2);
             }
         }
 
         // create sodoku squares
         gameState.squares = [];
         gameState.texts = [];
-        for (let i = 0; i < 81; i++) {
-            var x = 100 + 50 * (i % 9);
-            var y = 200 + 50 * Math.floor(i / 9);
+        gameState.dots = [];
+        for (let j = -4; j <= 4; j++) {
+            for (let i = -4; i <= 4; i++) {
+                let index = 9 * (j + 4) + (i + 4);
 
-            let square = this.add.rectangle(x, y, 50, 50).setStrokeStyle(1, 0x444444).setInteractive();
-            let text = this.add.text(x - 12, y - 17, gameState.entries[i], { fontSize: '40px', fill: '#4a65dd' });
-            if (gameState.entries[i] != '') {
-                text.setFill('#000000');
+                let square = this.add.rectangle(midWidth + i * s, midHeight + j * s, s, s).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive().setDepth(1);
+                let dot = this.add.circle(midWidth + (i + 0.4) * s, midHeight + (j - 0.4) * s, 0.05 * s, 0xffffff);
+                let text = this.add.text(midWidth + i * s, midHeight + j * s, gameState.entries[index], { fontSize: fontSize, fill: '#4a65dd' }).setOrigin(0.5).setDepth(1);
+                if (gameState.entries[index] != '') {
+                    text.setFill('#000000');
+                }
+
+                gameState.squares.push(square);
+                gameState.dots.push(dot);
+                gameState.texts.push(text);
             }
-
-            gameState.squares.push(square);
-            gameState.texts.push(text);
         }
 
         this.input.on('pointerdown', function() {
 			var pointer = this.input.activePointer;
-			if (pointer.worldX >= 75 && pointer.worldX <= 525 && pointer.worldY >= 175 && pointer.worldY <= 625) {
-	            let newIndex = 9 * Math.floor((pointer.worldY - 175) / 50) + Math.floor((pointer.worldX - 75) / 50);
+			if (pointer.worldX >= midWidth - 4.5 * s && pointer.worldX <= midWidth + 4.5 * s && pointer.worldY >= midHeight - 4.5 * s && pointer.worldY <= midHeight + 4.5 * s) {
+	            let newIndex = 9 * Math.floor((pointer.worldY - midHeight + 4.5 * s) / s) + Math.floor((pointer.worldX - midWidth + 4.5 * s) / s);
 
 	            if (gameState.index != -1) {
 	                gameState.squares[gameState.index].setFillStyle(0xffffff);
@@ -104,38 +112,71 @@ class GameScenePC extends Phaser.Scene {
 		});
 
 		gameState.seconds = 0;
-		let timeText = this.add.text(475, 150, 'Time 0:00', { fill: '#000000', fontSize: '20px'}).setOrigin(0.5);
+		let timeText = this.add.text(midWidth + 4.5 * s, midHeight - 5 * s, 'Time 0:00', { fill: '#000000', fontSize: fontSize2}).setOrigin(1, 0.5);
 
-		let restart = this.add.rectangle(115, 150, 80, 30).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive()
+		let hint = this.add.rectangle(midWidth - 4.5 * s, midHeight - 5 * s, s / 2, s / 2).setStrokeStyle(1, 0x444444).setOrigin(0, 0.5).setInteractive()
+			.on('pointerover', () => {hint.setFillStyle(0xdddddd)})
+			.on('pointerout', () => {hint.setFillStyle(0xffffff)})
+			.on('pointerdown', () => {
+                if (gameState.start[gameState.index] == '') {
+                    gameState.entries[gameState.index] = gameState.solution[gameState.index];
+                    gameState.texts[gameState.index].setText(gameState.solution[gameState.index]);
+                }
+            });
+		let hintSVG = this.add.image(midWidth - 4.25 * s, midHeight - 5 * s, 'hint').setOrigin(0.5);
+
+        let restart = this.add.rectangle(midWidth - 3.75 * s, midHeight - 5 * s, s / 2, s / 2).setStrokeStyle(1, 0x444444).setOrigin(0, 0.5).setInteractive()
 			.on('pointerover', () => {restart.setFillStyle(0xdddddd)})
 			.on('pointerout', () => {restart.setFillStyle(0xffffff)})
 			.on('pointerdown', () => {gameState.seconds = -1; for (var i = 0; i < 81; i++) {
 				gameState.entries[i] = gameState.start[i];
 				gameState.texts[i].setText(gameState.entries[i]);
 			}});
-		let restartText = this.add.text(115, 150, 'Restart', {fill: '#000000',fontSize: '12px'}).setOrigin(0.5);
-		let newGame = this.add.rectangle(205, 150, 80, 30).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive()
-			.on('pointerover', () => {newGame.setFillStyle(0xdddddd)})
-			.on('pointerout', () => {newGame.setFillStyle(0xffffff)})
-			.on('pointerdown', () => {this.scene.stop('GameScene'); game.scale.resize(window.innerWidth, window.innerHeight);
-				this.scene.start('StartScene');});
-		let newGameText = this.add.text(205, 150, 'New Game', {fill: '#000000',fontSize: '12px'}).setOrigin(0.5);
+		let restartSVG = this.add.image(midWidth - 3.5 * s, midHeight - 5 * s, 'restart').setOrigin(0.5);
 
-		let light = this.add.rectangle(270, 150, 30, 30).setStrokeStyle(1, 0x444444).setOrigin(0.5).setInteractive()
-			.on('pointerover', () => {light.setFillStyle(0xdddddd)})
-			.on('pointerout', () => {light.setFillStyle(0xffffff)})
-			.on('pointerdown', () => {gameState.hintMode = 1 - gameState.hintMode; for (var i = 0; i < 81; i++) {
-				if (gameState.start[i] == "") {
-					if (gameState.hintMode == 1 && gameState.solution[i] != gameState.entries[i]) {
-						gameState.texts[i].setFill('#aa2222');
-					} else {
-						gameState.texts[i].setFill('#4a65dd');
-					}
-				}
-			}});
-		let lightSVG = this.add.image(270, 150, 'lightbulb')
+        let home = this.add.rectangle(midWidth - 3 * s, midHeight - 5 * s, s / 2, s / 2).setStrokeStyle(1, 0x444444).setOrigin(0, 0.5).setInteractive()
+			.on('pointerover', () => {home.setFillStyle(0xdddddd)})
+			.on('pointerout', () => {home.setFillStyle(0xffffff)})
+			.on('pointerdown', () => {
+                this.scene.stop('GameScenePC');
+                this.scene.start('StartScenePC');
+			});
+		let homeSVG = this.add.image(midWidth - 2.75 * s, midHeight - 5 * s, 'home').setOrigin(0.5);
 
+        // keyboard functionalities
         gameState.keys = this.input.keyboard.addKeys('ONE,TWO,THREE,FOUR,FIVE,SIX,SEVEN,EIGHT,NINE');
+        
+        this.input.keyboard.on('keydown-A', () => {
+            if (gameState.index % 9 != 0) {
+                gameState.squares[gameState.index].setFillStyle(0xffffff);
+                gameState.index -= 1;
+                gameState.squares[gameState.index].setFillStyle(0xdddddd);
+            }
+        }, this);
+
+        this.input.keyboard.on('keydown-D', () => {
+            if (gameState.index % 9 != 8) {
+                gameState.squares[gameState.index].setFillStyle(0xffffff);
+                gameState.index += 1;
+                gameState.squares[gameState.index].setFillStyle(0xdddddd);
+            }
+        }, this);
+
+        this.input.keyboard.on('keydown-W', () => {
+            if (Math.floor(gameState.index / 9) != 0) {
+                gameState.squares[gameState.index].setFillStyle(0xffffff);
+                gameState.index -= 9;
+                gameState.squares[gameState.index].setFillStyle(0xdddddd);
+            }
+        }, this);
+
+        this.input.keyboard.on('keydown-S', () => {
+            if (Math.floor(gameState.index / 9) != 8) {
+                gameState.squares[gameState.index].setFillStyle(0xffffff);
+                gameState.index += 9;
+                gameState.squares[gameState.index].setFillStyle(0xdddddd);
+            }
+        }, this);
     }
 
     update() {
@@ -163,11 +204,8 @@ class GameScenePC extends Phaser.Scene {
         if (pressedNumber != '' && gameState.start[gameState.index] == '') {
             gameState.entries[gameState.index] = pressedNumber;
             gameState.texts[gameState.index].setText(pressedNumber);
-            if (gameState.hintMode && gameState.solution[gameState.index] != pressedNumber) {
-                gameState.texts[gameState.index].setFill('#aa2222');
-            } else {
-                gameState.texts[gameState.index].setFill('#4a65dd');
-            }
+            gameState.texts[gameState.index].setFill('#4a65dd');
+            gameState.dots[gameState.index].setFillStyle(0xa62222).setDepth(1);
         }
     }
 }

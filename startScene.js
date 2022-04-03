@@ -4,25 +4,37 @@ class StartScenePC extends Phaser.Scene {
 	}
 
 	create() {
-		// this.add.text(300, 250, 'Sudoku', {fill: '#000000', fontSize: '40px'}).setOrigin(0.5);
-		// this.add.text(300, 300, 'Choose Difficulty', {fill: '#000000', fontSize: '20px'}).setOrigin(0.5);
-		let easyBox = this.add.rectangle(config.width / 2, config.height / 2, 3 * unit, unit)
+		const fontSize = `${0.04 * w}px`;
+		const boxWidth = 0.21 * w;
+		const boxHeight = 0.07 * w;
+
+		this.add.text(0.5 * w, 0.25 * h, 'Sudoku', {fill: '#000000', fontSize: `${0.08 * w}px`}).setOrigin(0.5);
+
+		let boxY = 0.4 * h;
+		let missing = 35;
+		let easyBox = this.add.rectangle(midWidth, boxY, boxWidth, boxHeight)
 			.setStrokeStyle(4, 0x444444).setOrigin(0.5).setInteractive()
 			.on('pointerover', () => {easyBox.setFillStyle(0xdddddd)})
 			.on('pointerout', () => {easyBox.setFillStyle(0xffffff)})
-			.on('pointerdown', () => { gameState.missing = 35; this.scene.stop('StartScene'); config.width = 600; config.height = 800; game.scale.resize(600, 800);
-			this.scene.start('GameScene');
-			 });
-		// let easyText = this.add.text(300, 375, 'Easy', {fill: '#000000',fontSize: '20px'}).setOrigin(0.5);
-		// let mediumBox = this.add.rectangle(300, 450, 150, 50).setStrokeStyle(4, 0x444444).setOrigin(0.5).setInteractive()
-		// 	.on('pointerover', () => {mediumBox.setFillStyle(0xdddddd)})
-		// 	.on('pointerout', () => {mediumBox.setFillStyle(0xffffff)})
-		// 	.on('pointerdown', () => { gameState.missing = 45; this.scene.stop('StartScene'); this.scene.start('GameScene');});
-		// let mediumText = this.add.text(300, 450, 'Medium', {fill: '#000000',fontSize: '20px'}).setOrigin(0.5);
-		// let hardBox = this.add.rectangle(300, 525, 150, 50).setStrokeStyle(4, 0x444444).setOrigin(0.5).setInteractive()
-		// 	.on('pointerover', () => {hardBox.setFillStyle(0xdddddd)})
-		// 	.on('pointerout', () => {hardBox.setFillStyle(0xffffff)})
-		// 	.on('pointerdown', () => { gameState.missing = 50; this.scene.stop('StartScene'); this.scene.start('GameScene');});
-		// let hardText = this.add.text(300, 525, 'Hard', {fill: '#000000',fontSize: '20px'}).setOrigin(0.5);
+			.on('pointerdown', () => { gameState.missing = missing; this.scene.stop('StartScenePC'); this.scene.start('GameScenePC'); });
+		let easyText = this.add.text(midWidth, boxY, 'Easy', {fill: '#000000', fontSize: fontSize}).setOrigin(0.5);
+
+		boxY = 0.5 * h;
+		missing = 45;
+		let midBox = this.add.rectangle(midWidth, boxY, boxWidth, boxHeight)
+			.setStrokeStyle(4, 0x444444).setOrigin(0.5).setInteractive()
+			.on('pointerover', () => {midBox.setFillStyle(0xdddddd)})
+			.on('pointerout', () => {midBox.setFillStyle(0xffffff)})
+			.on('pointerdown', () => { gameState.missing = missing; this.scene.stop('StartScenePC'); this.scene.start('GameScenePC'); });
+		let midText = this.add.text(midWidth, boxY, 'Medium', {fill: '#000000', fontSize: fontSize}).setOrigin(0.5);
+
+		boxY = 0.6 * h;
+		missing = 55;
+		let hardBox = this.add.rectangle(midWidth, boxY, boxWidth, boxHeight)
+			.setStrokeStyle(4, 0x444444).setOrigin(0.5).setInteractive()
+			.on('pointerover', () => {hardBox.setFillStyle(0xdddddd)})
+			.on('pointerout', () => {hardBox.setFillStyle(0xffffff)})
+			.on('pointerdown', () => { gameState.missing = missing; this.scene.stop('StartScenePC'); this.scene.start('GameScenePC'); });
+		let hardText = this.add.text(midWidth, boxY, 'Hard', {fill: '#000000', fontSize: fontSize}).setOrigin(0.5);
 	}
 }
