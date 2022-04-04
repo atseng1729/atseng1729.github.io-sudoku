@@ -15,15 +15,27 @@ let isMobile = false;
 let w = 0.9 * Math.min(window.innerWidth, window.innerHeight);
 let h = w;
 let s = w / 12;
-const midWidth = 0.5 * w;
-const midHeight = 0.5 * h;
+let boxSpacing = w / 9;
+let sudokuFont = `${0.08 * w}px`;
+let fontSize = `${0.04 * w}px`;
+let boxWidth = 0.27 * w;
+let boxHeight = 0.09 * w;
 let scenes = [StartScenePC, GameScenePC];
 
-// if (isMobile) {
-//   width = window.innerWidth;
-//   height = window.innerHeight;
-//   scenes = [StartScenePC, GameScenePC];
-// }
+if (isMobile) {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    s = w / 10;
+    boxSpacing = 2.5 * s;
+    boxWidth = 0.6 * w;
+    boxHeight = 0.2 * w;
+    sudokuFont = `${0.16 * w}px`;
+    fontSize = `${0.12 * w}px`
+    scenes = [StartScenePC, GameScenePC];
+}
+
+const midWidth = 0.5 * w;
+const midHeight = 0.5 * h;
 
 const config = {
     type: Phaser.AUTO,
